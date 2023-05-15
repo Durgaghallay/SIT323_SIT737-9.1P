@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: todo-app
+  template:
+    metadata:
+      labels:
+        app: todo-app
+    spec:
+      containers:
+        - name: todo-app
+          image: akbarkz/todo-app:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3040
+          env:
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: password
+            - name: MONGODB_CONNECTION_STRING
+              value: mongodb://${MONGODB_USERNAME}:${MONGODB_PASSWORD}@mongo-service:27017/todo-app?authSource=admin
